@@ -131,6 +131,7 @@ The extractor outputs slide-by-slide or page-by-page text. After extraction, you
 - For `速查表`, explicitly highlight difficult formulas and likely exam points, with both student and teacher perspectives in mind.
 - `习题与答案` should include questions plus answers, aligned to the extracted content and difficulty profile.
 - If the user asks for `速查表`, aggressively compress wording while preserving the highest-value exam content.
+- For `速查表`, keep layout tight with minimal whitespace. Prefer dense tables and compact formatting to avoid wasted space.
 - If the user gives a target page count for `速查表` / `cheatsheet`, strictly hit that page count by compressing or expanding content. If over, compress aggressively; if under, add summary tables or compact comparison blocks to fill the gap.
 - When targeting a small page budget, prefer denser tables, shorter bullets, tighter headings, formula-first presentation, and removal of low-yield transitions.
 - The default `速查表` / `cheatsheet` mode should be especially suitable for college students doing exam cramming or organizing fast notes.

@@ -85,7 +85,7 @@ The intended workflow is:
 5. The agent writes the requested cheatsheet, notes, or textbook output with its own LLM capabilities.
 6. The result is saved as Markdown, LaTeX (plus compiled PDF), or exported to DOCX.
 
-When the output is a cheatsheet, the agent should ask for the target page count and treat it as a hard constraint. 
+When the output is a cheatsheet, the agent should ask for the target page count and treat it as a hard constraint. Keep whitespace minimal and layout tight.
 
 ## Example Prompts
 

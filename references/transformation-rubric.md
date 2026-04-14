@@ -28,6 +28,7 @@ Use this rubric after extracting slide content and before drafting the final tex
 - Use tables or tightly structured bullets when they improve density.
 - Include symbolic notation whenever the chapter materially depends on it.
 - If a target page count is given, treat it as a hard constraint. If over, compress; if under, add dense summary tables or comparison grids to reach the target.
+- Keep whitespace to a minimum; cheatsheets should look compact and space-efficient.
 
 ## Exercises With Answers
 
