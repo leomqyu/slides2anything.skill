@@ -1,6 +1,6 @@
 <div align="center">
 
-# slides2anything
+# slides2anything.skill
 
 English | [中文](README_ZH.md)
 
