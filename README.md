@@ -9,7 +9,7 @@ English | [中文](README_ZH.md)
 [![Codex Skill](https://img.shields.io/badge/Codex-Skill-blueviolet.svg)](https://openai.com)
 [![AgentSkills](https://img.shields.io/badge/AgentSkills-Standard-green)](https://agentskills.io)
 
-> *"Turn fragmented slides into cheatsheets, notes, and study material you can actually use."*
+> *"Turn fragmented slides into usable final study files for review, note-taking, and exams."*
 
 <br>
 
@@ -18,12 +18,12 @@ Still rebuilding PDF handouts into something that reads like real course materia
 Still wasting time writing transitions, definitions, examples, summaries, and review questions by hand?<br>
 
 **slides2anything** is a skill for turning `.ppt`, `.pptx`, and `.pdf` sources into high-value study outputs.  
-It does not stop at raw extraction. It helps the agent ask for missing context, read the source, and then use its own LLM writing ability to produce exam-oriented cheatsheets, teacher notes, and textbook-quality content.
+It does not stop at raw extraction. It helps the agent ask for missing context, read the source, and then use its own LLM writing ability to produce directly usable final files for exam cramming, note-taking, revision, and teaching.
 
 <br>
 
 Accepts slide decks and PDF documents<br>
-Outputs **cheatsheets / notes / textbook drafts** in **Markdown / Word DOCX / LaTeX**<br>
+Outputs **cheatsheets / notes / textbook chapters** in **Markdown / Word DOCX / LaTeX**<br>
 Lets the agent ask for file paths, output format, and writing mode before it starts
 
 [Requirements](#requirements) · [How It Works](#how-it-works) · [Example Prompts](#example-prompts) · [Notes](#notes)
@@ -36,13 +36,13 @@ Lets the agent ask for file paths, output format, and writing mode before it sta
 
 | Typical workflow | slides2anything |
 |------|------|
-| Extracts text and leaves you with raw fragments | Extracts first, then helps the agent turn fragments into teachable chapters |
+| Extracts text and leaves you with raw fragments | Extracts first, then helps the agent turn fragments into a usable final study file |
 | Assumes the first prompt already contains every parameter | Prompts the agent to ask for missing paths, format, structure, and mode |
 | Treats PPT and PDF as plain text sources | Treats them as teaching material with implied structure and pedagogy |
 | Produces flat notes or rigid templates | Uses the model to write cheatsheets, teacher notes, summaries, formulas, and full teaching text |
-| Exports a file | Produces a draft that is actually usable for teaching, editing, and publishing |
+| Exports a file | Produces a final output intended to be directly usable for study, revision, and exam prep |
 
-In short: this project is designed for **teaching-oriented and exam-oriented rewriting**, not just text extraction.
+In short: this project is designed for **teaching-oriented and exam-oriented rewriting**, especially for **college students doing exam cramming or building clean notes fast**, not just text extraction.
 
 ## Requirements
 
@@ -72,7 +72,7 @@ The intended workflow is:
 2. The agent asks follow-up questions if key information is missing.
 3. The extractor reads the PPT or PDF source.
 4. The agent uses the extracted material as grounding.
-5. The agent writes the requested cheatsheet, notes, or textbook draft with its own LLM capabilities.
+5. The agent writes the requested cheatsheet, notes, or textbook output with its own LLM capabilities.
 6. The result is saved as Markdown, LaTeX, or exported to DOCX.
 
 This is an important design choice: the actual output should be written by the agent, not by a rigid template script.
@@ -84,6 +84,8 @@ Users do not need to write commands. Natural language is enough.
 Examples:
 
 - Please use `slides2anything` to turn my PPT into a cheatsheet for exam review.
+- Use `slides2anything` to make a final exam cheatsheet from my lecture slides.
+- Use `slides2anything` to turn my PDF into clean revision notes for a college midterm.
 - Please use `slides2anything` on my PDF handout and ask me for the missing file path and output format first.
 - I want to turn a lecture deck into teacher notes. Use `slides2anything` and guide me through the missing options.
 - Use `slides2anything` to create a LaTeX textbook draft from my PDF, but ask me what structure I want before you start.
@@ -102,4 +104,3 @@ The agent should normally ask for:
 - For `.pdf` inputs, the extractor prefers system PDF text tools when available and falls back to an internal parser otherwise.
 - For `.docx` output, `pandoc` is used only as an export step after the agent has already written the content.
 - If the source contains formulas, symbols, or conversion processes, the agent should write them directly into the final output rather than referring back to the slides.
-- This project is designed to generate a strong first draft, not to fabricate missing subject matter that is absent from the source.
