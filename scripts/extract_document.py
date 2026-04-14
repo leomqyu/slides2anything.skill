@@ -19,9 +19,12 @@ from extract_ppt import extract_pptx, maybe_convert_ppt
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Extract text from .ppt, .pptx, or .pdf files."
+        description="Extract text from .ppt, .pptx, or .pdf files, or from a directory containing them."
     )
-    parser.add_argument("input_file", help="Path to .ppt, .pptx, or .pdf file")
+    parser.add_argument(
+        "input_file",
+        help="Path to a .ppt/.pptx/.pdf file, or a directory containing those files",
+    )
     parser.add_argument(
         "--format",
         choices=("markdown", "json"),
@@ -236,7 +239,18 @@ def extract_presentation(input_path: Path) -> list[dict[str, object]]:
     ]
 
 
-def extract_document(input_path: Path) -> list[dict[str, object]]:
+def list_supported_files(input_path: Path) -> list[Path]:
+    supported = {".ppt", ".pptx", ".pdf"}
+    if input_path.is_file():
+        return [input_path]
+    files: list[Path] = []
+    for path in sorted(input_path.rglob("*")):
+        if path.is_file() and path.suffix.lower() in supported:
+            files.append(path)
+    return files
+
+
+def extract_single_file(input_path: Path) -> list[dict[str, object]]:
     suffix = input_path.suffix.lower()
     if suffix in {".ppt", ".pptx"}:
         return extract_presentation(input_path)
@@ -245,14 +259,36 @@ def extract_document(input_path: Path) -> list[dict[str, object]]:
     raise SystemExit("Input must be a .ppt, .pptx, or .pdf file.")
 
 
+def extract_document(input_path: Path) -> list[dict[str, object]]:
+    if input_path.is_dir():
+        files = list_supported_files(input_path)
+        if not files:
+            raise SystemExit("No supported files found in the directory.")
+        units: list[dict[str, object]] = []
+        for file_path in files:
+            for unit in extract_single_file(file_path):
+                unit["source"] = str(file_path)
+                units.append(unit)
+        return units
+    units = extract_single_file(input_path)
+    for unit in units:
+        unit["source"] = str(input_path)
+    return units
+
+
 def format_markdown(units: Iterable[dict[str, object]], source: Path) -> str:
-    lines = ["# Extracted Content", "", f"Source: `{source}`", ""]
+    header = f"Source directory: `{source}`" if source.is_dir() else f"Source: `{source}`"
+    lines = ["# Extracted Content", "", header, ""]
     for unit in units:
         label = unit["unit_label"]
         number = unit["unit_number"]
         title = unit["title"]
         text = unit["text"]
         notes = unit["notes"]
+        source_file = unit.get("source")
+        if source.is_dir() and source_file:
+            lines.append(f"Source file: `{source_file}`")
+            lines.append("")
         lines.append(f"## {label} {number}: {title}")
         lines.append("")
         lines.append("Text:")
@@ -281,6 +317,7 @@ def main() -> int:
         rendered = json.dumps(
             {
                 "source": str(input_path),
+                "source_type": "directory" if input_path.is_dir() else "file",
                 "units": units,
             },
             ensure_ascii=False,

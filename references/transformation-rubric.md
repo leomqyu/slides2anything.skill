@@ -23,9 +23,17 @@ Use this rubric after extracting slide content and before drafting the final tex
 
 - If the requested mode is `速查表` / `cheatsheet`, compress aggressively.
 - Prefer formulas, definitions, ranges, mappings, conversion steps, code patterns, and high-yield comparisons.
+- Explicitly emphasize difficult formulas, tricky conversion steps, and likely exam points from both student and teacher perspectives.
 - Minimize connective prose; maximize retrieval value for exam review.
 - Use tables or tightly structured bullets when they improve density.
 - Include symbolic notation whenever the chapter materially depends on it.
+- If a target page count is given, treat it as a hard constraint. If over, compress; if under, add dense summary tables or comparison grids to reach the target.
+
+## Exercises With Answers
+
+- If the requested mode is `习题与答案` / `exercises with answers`, generate questions that map directly to the extracted content.
+- Provide clear, correct answers immediately after each question.
+- Mix question types when appropriate: definitions, conversions, comparisons, application problems, and explanation prompts.
 
 ## Minimum Substance Standard
 

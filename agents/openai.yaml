@@ -1,7 +1,7 @@
 interface:
   display_name: "Slides To Anything"
   short_description: "Turn slide decks and PDFs into cheatsheets, teacher notes, and textbook-quality study material"
-  default_prompt: "Use $slides2anything to process a .ppt, .pptx, or .pdf source. Ask for any missing file path, output path, format, or writing mode first, mentioning cheatsheet before teacher notes and textbook. Extract the source content, then write substantial standalone output with the model's own reasoning and writing ability. Do not return a hollow outline, do not tell the reader that the slides already contain the example, and preserve formulas aggressively, especially for DOCX and LaTeX."
+  default_prompt: "Use $slides2anything to process a .ppt, .pptx, or .pdf source (or a folder of such files). Ask for any missing file path, output path, format, or writing mode first, mentioning cheatsheet before teacher notes and textbook. Extract the source content, then write substantial standalone output with the model's own reasoning and writing ability. Do not return a hollow outline, do not tell the reader that the slides already contain the example, and preserve formulas aggressively, especially for DOCX and LaTeX. If output is LaTeX, compile a PDF."
 
 policy:
   allow_implicit_invocation: true

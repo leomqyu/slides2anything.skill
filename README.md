@@ -23,7 +23,7 @@ It does not stop at raw extraction. It helps the agent ask for missing context, 
 <br>
 
 Accepts slide decks and PDF documents<br>
-Outputs **cheatsheets / notes / textbook chapters** in **Markdown / Word DOCX / LaTeX**<br>
+Outputs **cheatsheets / notes / textbook chapters / exercises with answers** in **Markdown / Word DOCX / LaTeX**<br>
 Lets the agent ask for file paths, output format, and writing mode before it starts
 
 [Requirements](#requirements) · [How It Works](#how-it-works) · [Example Prompts](#example-prompts) · [Notes](#notes)
@@ -44,6 +44,15 @@ Lets the agent ask for file paths, output format, and writing mode before it sta
 
 In short: this project is designed for **teaching-oriented and exam-oriented rewriting**, especially for **college students doing exam cramming or building clean notes fast**, not just text extraction.
 
+## Features
+
+- Supports single files or batch folder input (PPT/PPTX/PDF)
+- Cheatsheet mode focuses on hard formulas and likely exam points
+- Teacher notes, textbook chapters, and revision notes are all supported
+- Exercises-with-answers output mode
+- LaTeX output also compiles to PDF
+- Formula-preserving output for DOCX and LaTeX
+
 ## Requirements
 
 This skill works best when the environment includes:
@@ -51,6 +60,7 @@ This skill works best when the environment includes:
 - Python 3, for source extraction
 - LibreOffice, if you need to convert legacy `.ppt` files into `.pptx`
 - Pandoc, if you want the final result exported as `.docx`
+- TeX Live (or a LaTeX engine like `xelatex`) if you want LaTeX to compile into PDF
 - Optionally `pdftotext`, which can improve PDF extraction quality when available
 
 If you only work with `.pptx`, you may not need LibreOffice.
@@ -70,20 +80,12 @@ The intended workflow is:
 
 1. The user asks for a study output in natural language.
 2. The agent asks follow-up questions if key information is missing.
-3. The extractor reads the PPT or PDF source.
+3. The extractor reads the PPT/PDF source (or all files inside a folder).
 4. The agent uses the extracted material as grounding.
 5. The agent writes the requested cheatsheet, notes, or textbook output with its own LLM capabilities.
-6. The result is saved as Markdown, LaTeX, or exported to DOCX.
+6. The result is saved as Markdown, LaTeX (plus compiled PDF), or exported to DOCX.
 
-This is an important design choice: the actual output should be written by the agent, not by a rigid template script.
-
-When the output is a cheatsheet, the agent should also ask for the approximate target page count and then compress structure, wording, and layout density so the result fits that page budget as closely as possible.
-
-A concrete example of that workflow:
-
-- Agent question: `If this should be a cheatsheet, about how many pages should it target?`
-- User answer: `2 pages.`
-- Expected behavior: the agent should then favor denser tables, shorter bullets, formula-first presentation, and tighter layout so the final file is realistically compressible into 2 pages.
+When the output is a cheatsheet, the agent should ask for the target page count and treat it as a hard constraint. 
 
 ## Example Prompts
 
@@ -97,6 +99,7 @@ Examples:
 - Use `slides2anything` to turn my PDF into clean revision notes for a college midterm.
 - Please use `slides2anything` on my PDF handout and ask me for the missing file path and output format first.
 - I want to turn a lecture deck into teacher notes. Use `slides2anything` and guide me through the missing options.
+- Use `slides2anything` to generate exercises with answers from my lecture deck.
 - Use `slides2anything` to create a LaTeX textbook draft from my PDF, but ask me what structure I want before you start.
 
 The agent should normally ask for:
@@ -104,7 +107,7 @@ The agent should normally ask for:
 - the PPT or PDF path
 - the desired output path
 - the output format: Markdown, DOCX, or LaTeX
-- the target mode: cheatsheet, teacher notes, textbook, or student handout
+- the target mode: cheatsheet, teacher notes, textbook, exercises with answers, notes, or student handout
 - for cheatsheets, the approximate target page count
 - whether to include learning objectives, glossary, summary, and exercises
 
@@ -116,5 +119,5 @@ For example, in a cheatsheet workflow, a good follow-up question is:
 
 - For `.ppt` inputs, the extractor will try to convert the file with `libreoffice` or `soffice`.
 - For `.pdf` inputs, the extractor prefers system PDF text tools when available and falls back to an internal parser otherwise.
-- For `.docx` output, `pandoc` is used only as an export step after the agent has already written the content.
-- If the source contains formulas, symbols, or conversion processes, the agent should write them directly into the final output rather than referring back to the slides.
+- For LaTeX output, the agent should compile a PDF using `xelatex` when available (especially for Chinese).
+- For folder input, the extractor will read all supported files inside the directory and synthesize a combined output.

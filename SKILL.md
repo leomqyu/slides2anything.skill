@@ -1,11 +1,11 @@
 ---
 name: slides2anything
-description: Transform a PowerPoint deck or PDF document into useful study outputs. Use this skill when the user provides a .ppt, .pptx, or .pdf file and wants a cheatsheet（中文可译为“速查表”）, notes, teacher notes, textbook-style prose, formulas, summaries, exercises, or other structured learning material derived from the source content.
+description: Transform a PowerPoint deck or PDF document into useful study outputs. Use this skill when the user provides a .ppt, .pptx, or .pdf file (or a folder of such files) and wants a cheatsheet（中文可译为“速查表”）, notes, teacher notes, textbook-style prose, exercises with answers, formulas, summaries, or other structured learning material derived from the source content.
 ---
 
 # Slides To Anything
 
-Use this skill when the input is a slide deck or PDF handout and the target output is a high-value learning artifact rather than bullets or fragmented pages. By default, prefer a cheatsheet / 速查表 unless the user explicitly asks for textbook prose, teacher notes, or another mode.
+Use this skill when the input is a slide deck, a PDF handout, or a folder of such files and the target output is a high-value learning artifact rather than bullets or fragmented pages. By default, prefer a cheatsheet / 速查表 unless the user explicitly asks for textbook prose, teacher notes, or another mode.
 
 ## Conversation Policy
 
@@ -13,10 +13,11 @@ Do not assume the user already provided every parameter in one prompt. If any of
 
 - the PPT file path
 - or the PDF file path
+- or a folder path containing multiple PPT/PDF files
 - the desired output path
 - the target mode
 - whether the user wants Markdown, DOCX, or LaTeX
-- whether they want a cheatsheet, notes, teacher notes, textbook prose, or student handout style
+- whether they want a cheatsheet, teacher notes, textbook prose, exercises with answers, notes, or student handout style
 - for cheatsheets, the approximate target page count
 - any required chapter structure such as learning objectives, glossary, summary, or exercises
 
@@ -29,23 +30,23 @@ Match the user's language:
 
 Recommended default questions in Chinese:
 
-1. 你的 PPT 或 PDF 文件路径是什么？
+1. 你的 PPT / PDF 文件路径是什么？如果是多个文件，可以直接给文件夹路径。
 2. 你希望输出到哪个路径？
-3. 你想要哪种模式：速查表、笔记、教师讲义、教材正文，还是学生讲义？
+3. 你想要哪种模式：速查表、教师讲义、教材正文、习题与答案，还是笔记或学生讲义？
 4. 你希望输出为 Markdown、DOCX，还是 LaTeX？
 5. 如果是速查表，你希望大概控制在几页？
 6. 你是否需要学习目标、关键术语、小结和练习题？
 
 Recommended default questions in English:
 
-1. What is the path to your PPT or PDF file?
+1. What is the path to your PPT/PDF file? If it is a folder, share the folder path.
 2. Where should I save the output?
-3. Which mode do you want: cheatsheet, notes, teacher notes, textbook chapter, or student handout?
+3. Which mode do you want: cheatsheet, teacher notes, textbook chapter, exercises with answers, notes, or student handout?
 4. Which output format do you want: Markdown, DOCX, or LaTeX?
 5. If it is a cheatsheet, about how many pages should it target?
 6. Do you want learning objectives, key terms, a summary, and practice questions?
 
-When asking about the mode, mention the options in this order: `速查表` / `cheatsheet` first, `笔记` / `notes` second, `教师讲义` / `teacher notes` third, `教材正文` / `textbook chapter` fourth, and then any other modes if relevant.
+When asking about the mode, mention the options in this order: `速查表` / `cheatsheet` first, `教师讲义` / `teacher notes` second, `教材正文` / `textbook chapter` third, then `习题与答案` / `exercises with answers`, and finally any other modes if relevant.
 
 If the user does not specify a mode after being asked, default to `速查表` in Chinese interactions and `cheatsheet` in English interactions.
 If the user does not specify an output format after being asked, default to `Markdown`.
@@ -55,23 +56,27 @@ If the user does not specify an output format after being asked, default to `Mar
 - `.pptx`: supported directly
 - `.ppt`: supported if `libreoffice` or `soffice` is installed locally so it can be converted to `.pptx`
 - `.pdf`: supported directly; text-based PDFs work best
+- a folder containing multiple supported files; all files should be read and synthesized into a combined output
 
 ## Quick Workflow
 
 1. Check whether the file path, output path, mode, and output format are known. If not, ask the user first.
-2. Run the bundled extractor to get slide-by-slide or page-by-page source text.
-3. Read the extracted content and infer the structure: chapter, section, concept flow, examples, and missing transitions.
+2. If the input is a folder, read all supported files inside it and treat them as a combined source corpus.
+3. Run the bundled extractor to get slide-by-slide or page-by-page source text.
+4. Read the extracted content and infer the structure: chapter, section, concept flow, examples, and missing transitions.
 4. Use your own LLM writing ability to rewrite the material into the requested study format. Do not rely on a rigid template generator.
 5. Rewrite into the requested mode:
    - for `速查表` / `cheatsheet`, prefer formulas, definitions, conversion rules, ranges, contrasts, and compact reminders
-   - for `速查表` / `cheatsheet`, ask for the target page count if the user did not provide it, then make the structure and wording denser so the output fits the requested page budget as closely as possible
+   - for `速查表` / `cheatsheet`, explicitly prioritize difficult formulas and high-frequency exam points from both student and teacher perspectives
+   - for `速查表` / `cheatsheet`, ask for the target page count if the user did not provide it, then strictly enforce the page budget: compress if over, or add high-yield summary tables if under
    - for `笔记` / `notes`, produce clean revision-oriented notes with slightly more connective explanation
    - for `教材正文` / `textbook chapter`, expand bullet points into full explanatory prose
+   - for `习题与答案` / `exercises with answers`, generate questions aligned to the content and provide correct answers
    - preserve formulas, symbols, names, and ordered procedures
    - clearly mark uncertain or underspecified content instead of fabricating details
 6. Save the result in the requested format:
    - `Markdown`: write the output directly as `.md`
-   - `LaTeX`: write the output directly as `.tex`
+   - `LaTeX`: write the output directly as `.tex`, then compile it into a `.pdf` and save both
    - `DOCX`: first prepare the content as Markdown, then convert it with `pandoc` if available
 7. Return the result in the format the user asked for. If unspecified after clarification, default to:
    - title
@@ -92,6 +97,7 @@ Useful variants:
 ```bash
 python3 scripts/extract_document.py /absolute/path/to/input.pdf --format json
 python3 scripts/extract_document.py /absolute/path/to/input.ppt --output /tmp/deck.md
+python3 scripts/extract_document.py /absolute/path/to/folder --output /tmp/combined.md
 ```
 
 The extractor outputs slide-by-slide or page-by-page text. After extraction, you should write the final study output yourself using the extracted content and the user-requested mode.
@@ -103,6 +109,7 @@ The extractor outputs slide-by-slide or page-by-page text. After extraction, you
 - If the user asks for a richer or more polished output, spend effort on explanation quality, transitions, examples, and conceptual clarity instead of falling back to canned wording.
 - If the source is sparse, say what is underspecified instead of pretending the source contained more than it did.
 - If the user asks for DOCX, write the content first, then export it with `pandoc` only as a packaging step.
+- If the user asks for LaTeX, compile the `.tex` into `.pdf` (use `xelatex` when Chinese is present if available).
 - The final output must read as a standalone learning resource. Do not assume the reader has already seen the slides, PPT, or PDF.
 - Do not write sentences like “课件中给出了……”, “PPT 中展示了……”, “从上面的幻灯片可以看出……”, or similar references that make the source deck a prerequisite for understanding.
 - If the source contains an example, formula, or conversion process, restate it directly in the output as part of the teaching material.
@@ -121,8 +128,10 @@ The extractor outputs slide-by-slide or page-by-page text. After extraction, you
 - `练习题` should be tied to the chapter content and test understanding, comparison, conversion, explanation, or application.
 - `教师讲义` should include real teaching guidance such as sequencing, emphasis, likely misconceptions, and usable classroom prompts.
 - `速查表` should be compact, exam-oriented, and information-dense. Favor formulas, conversion rules, ranges, definitions, comparison tables, and minimal but high-yield reminders.
+- For `速查表`, explicitly highlight difficult formulas and likely exam points, with both student and teacher perspectives in mind.
+- `习题与答案` should include questions plus answers, aligned to the extracted content and difficulty profile.
 - If the user asks for `速查表`, aggressively compress wording while preserving the highest-value exam content.
-- If the user gives a target page count for `速查表` / `cheatsheet`, actively optimize density, grouping, and brevity so the final output is realistically compressible into that many pages.
+- If the user gives a target page count for `速查表` / `cheatsheet`, strictly hit that page count by compressing or expanding content. If over, compress aggressively; if under, add summary tables or compact comparison blocks to fill the gap.
 - When targeting a small page budget, prefer denser tables, shorter bullets, tighter headings, formula-first presentation, and removal of low-yield transitions.
 - The default `速查表` / `cheatsheet` mode should be especially suitable for college students doing exam cramming or organizing fast notes.
 - If the source chapter is long, the output should also be correspondingly substantial. Do not compress a full chapter into a few thin paragraphs.
@@ -153,6 +162,7 @@ The extractor outputs slide-by-slide or page-by-page text. After extraction, you
 - If the source contains formulas or symbolic relations, preserve them and use them actively in the output.
 - For `DOCX` output, try to include equations in a form that `pandoc` can convert cleanly into Word equations when possible.
 - For `LaTeX` output, be more formula-rich and explicit with notation than in prose-only formats.
+- When outputting LaTeX, always produce a compiled PDF alongside the `.tex`.
 
 ## Output Modes
 
@@ -162,6 +172,7 @@ Choose the closest mode to the user request.
 - `笔记`: revision-oriented notes; in English contexts this should be called `notes`
 - `教材正文`: formal, sectioned textbook prose
 - `教师讲义`: more explanatory, includes teaching transitions
+- `习题与答案`: exercises with answers derived from the content
 - `学生讲义`: simpler wording, stronger summaries
 - `习题扩展`: derive review questions and short exercises from the source deck
 
