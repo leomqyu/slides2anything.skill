@@ -17,6 +17,7 @@ Do not assume the user already provided every parameter in one prompt. If any of
 - the target mode
 - whether the user wants Markdown, DOCX, or LaTeX
 - whether they want a cheatsheet, notes, teacher notes, textbook prose, or student handout style
+- for cheatsheets, the approximate target page count
 - any required chapter structure such as learning objectives, glossary, summary, or exercises
 
 When asking follow-up questions, keep them short and concrete. Prefer asking for the minimum information needed to proceed.
@@ -32,7 +33,8 @@ Recommended default questions in Chinese:
 2. 你希望输出到哪个路径？
 3. 你想要哪种模式：速查表、笔记、教师讲义、教材正文，还是学生讲义？
 4. 你希望输出为 Markdown、DOCX，还是 LaTeX？
-5. 你是否需要学习目标、关键术语、小结和练习题？
+5. 如果是速查表，你希望大概控制在几页？
+6. 你是否需要学习目标、关键术语、小结和练习题？
 
 Recommended default questions in English:
 
@@ -40,7 +42,8 @@ Recommended default questions in English:
 2. Where should I save the output?
 3. Which mode do you want: cheatsheet, notes, teacher notes, textbook chapter, or student handout?
 4. Which output format do you want: Markdown, DOCX, or LaTeX?
-5. Do you want learning objectives, key terms, a summary, and practice questions?
+5. If it is a cheatsheet, about how many pages should it target?
+6. Do you want learning objectives, key terms, a summary, and practice questions?
 
 When asking about the mode, mention the options in this order: `速查表` / `cheatsheet` first, `笔记` / `notes` second, `教师讲义` / `teacher notes` third, `教材正文` / `textbook chapter` fourth, and then any other modes if relevant.
 
@@ -61,6 +64,7 @@ If the user does not specify an output format after being asked, default to `Mar
 4. Use your own LLM writing ability to rewrite the material into the requested study format. Do not rely on a rigid template generator.
 5. Rewrite into the requested mode:
    - for `速查表` / `cheatsheet`, prefer formulas, definitions, conversion rules, ranges, contrasts, and compact reminders
+   - for `速查表` / `cheatsheet`, ask for the target page count if the user did not provide it, then make the structure and wording denser so the output fits the requested page budget as closely as possible
    - for `笔记` / `notes`, produce clean revision-oriented notes with slightly more connective explanation
    - for `教材正文` / `textbook chapter`, expand bullet points into full explanatory prose
    - preserve formulas, symbols, names, and ordered procedures
@@ -118,6 +122,8 @@ The extractor outputs slide-by-slide or page-by-page text. After extraction, you
 - `教师讲义` should include real teaching guidance such as sequencing, emphasis, likely misconceptions, and usable classroom prompts.
 - `速查表` should be compact, exam-oriented, and information-dense. Favor formulas, conversion rules, ranges, definitions, comparison tables, and minimal but high-yield reminders.
 - If the user asks for `速查表`, aggressively compress wording while preserving the highest-value exam content.
+- If the user gives a target page count for `速查表` / `cheatsheet`, actively optimize density, grouping, and brevity so the final output is realistically compressible into that many pages.
+- When targeting a small page budget, prefer denser tables, shorter bullets, tighter headings, formula-first presentation, and removal of low-yield transitions.
 - The default `速查表` / `cheatsheet` mode should be especially suitable for college students doing exam cramming or organizing fast notes.
 - If the source chapter is long, the output should also be correspondingly substantial. Do not compress a full chapter into a few thin paragraphs.
 

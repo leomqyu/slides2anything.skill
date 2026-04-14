@@ -2,7 +2,7 @@
 
 # slides2anything.skill
 
-English | [中文](README_ZH.md)
+English | [中文](README.ZH.md)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://python.org)
@@ -17,7 +17,7 @@ Still staring at a deck full of bullets, formulas, and half-finished lecture not
 Still rebuilding PDF handouts into something that reads like real course material?<br>
 Still wasting time writing transitions, definitions, examples, summaries, and review questions by hand?<br>
 
-**slides2anything** is a skill for turning `.ppt`, `.pptx`, and `.pdf` sources into high-value study outputs.  
+**slides2anything** is a skill for turning `.ppt`, `.pptx`, and `.pdf` sources into high-value study outputs such as realistic cheatsheets, notes, and textbook chapters.  
 It does not stop at raw extraction. It helps the agent ask for missing context, read the source, and then use its own LLM writing ability to produce directly usable final files for exam cramming, note-taking, revision, and teaching.
 
 <br>
@@ -39,7 +39,7 @@ Lets the agent ask for file paths, output format, and writing mode before it sta
 | Extracts text and leaves you with raw fragments | Extracts first, then helps the agent turn fragments into a usable final study file |
 | Assumes the first prompt already contains every parameter | Prompts the agent to ask for missing paths, format, structure, and mode |
 | Treats PPT and PDF as plain text sources | Treats them as teaching material with implied structure and pedagogy |
-| Produces flat notes or rigid templates | Uses the model to write cheatsheets, teacher notes, summaries, formulas, and full teaching text |
+| Produces flat notes or rigid templates | Uses the model to write realistic cheatsheets, revision notes, teacher notes, summaries, formulas, and full teaching text |
 | Exports a file | Produces a final output intended to be directly usable for study, revision, and exam prep |
 
 In short: this project is designed for **teaching-oriented and exam-oriented rewriting**, especially for **college students doing exam cramming or building clean notes fast**, not just text extraction.
@@ -77,6 +77,14 @@ The intended workflow is:
 
 This is an important design choice: the actual output should be written by the agent, not by a rigid template script.
 
+When the output is a cheatsheet, the agent should also ask for the approximate target page count and then compress structure, wording, and layout density so the result fits that page budget as closely as possible.
+
+A concrete example of that workflow:
+
+- Agent question: `If this should be a cheatsheet, about how many pages should it target?`
+- User answer: `2 pages.`
+- Expected behavior: the agent should then favor denser tables, shorter bullets, formula-first presentation, and tighter layout so the final file is realistically compressible into 2 pages.
+
 ## Example Prompts
 
 Users do not need to write commands. Natural language is enough.
@@ -85,6 +93,7 @@ Examples:
 
 - Please use `slides2anything` to turn my PPT into a cheatsheet for exam review.
 - Use `slides2anything` to make a final exam cheatsheet from my lecture slides.
+- Use `slides2anything` to make a 2-page cheatsheet from my lecture slides, and ask me the target page count first if I forget it.
 - Use `slides2anything` to turn my PDF into clean revision notes for a college midterm.
 - Please use `slides2anything` on my PDF handout and ask me for the missing file path and output format first.
 - I want to turn a lecture deck into teacher notes. Use `slides2anything` and guide me through the missing options.
@@ -96,7 +105,12 @@ The agent should normally ask for:
 - the desired output path
 - the output format: Markdown, DOCX, or LaTeX
 - the target mode: cheatsheet, teacher notes, textbook, or student handout
+- for cheatsheets, the approximate target page count
 - whether to include learning objectives, glossary, summary, and exercises
+
+For example, in a cheatsheet workflow, a good follow-up question is:
+
+- `If this should be a cheatsheet, about how many pages should it target?`
 
 ## Notes
 
